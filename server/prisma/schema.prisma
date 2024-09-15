@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = "file:../database/database.db"
+}
+
+model client {
+    id            String         @id
+    model         String
+    update        DateTime       @default(now())
+    number        String
+    ip            String         @default("Unknown")
+    zone          String
+    messages      message[]
+    notifications notification[]
+    requests      request[]
+    logs          log[]
+}
+
+model message {
+    id       String   @id @default(cuid())
+    from     String
+    text     String
+    date     DateTime @default(now())
+    client   client   @relation(fields: [clientId], references: [id])
+    clientId String
+}
+
+model notification {
+    id       String   @id @default(cuid())
+    title    String
+    text     String
+    date     DateTime @default(now())
+    client   client   @relation(fields: [clientId], references: [id])
+    clientId String
+}
+
+model request {
+    id        String   @id @default(cuid())
+    request   String
+    date      DateTime @default(now())
+    completed Boolean  @default(false)
+    data      data[]
+    client    client   @relation(fields: [clientId], references: [id])
+    clientId  String
+}
+
+model data {
+    id        String  @id @default(cuid())
+    key       String
+    value     String
+    request   request @relation(fields: [requestId], references: [id])
+    requestId String
+}
+
+model log {
+    id       String   @id @default(cuid())
+    message  String
+    date     DateTime @default(now())
+    client   client   @relation(fields: [clientId], references: [id])
+    clientId String
+}
